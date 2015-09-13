@@ -4,7 +4,9 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.7.0"]
-                 [org.clojure/data.json "0.2.6"]]
+                 [org.clojure/data.json "0.2.6"]
+                 [clj-time "0.11.0"]
+                 [me.raynes/fs "1.4.6"]]
   :main ^:skip-aot lift-records.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}})

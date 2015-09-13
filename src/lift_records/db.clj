@@ -1,14 +1,18 @@
 (ns lift-records.db
   (:gen-class)
-  (:require [clojure.data.json :as json])
-  (:require [clojure.java.io :as io]))
+  (:require [clojure.data.json :as json]
+            [clojure.java.io :as io]
+            [me.raynes.fs :as fs :only expand-home]))
 
-(def db-path "~/.lift_records/db.json")
+(def db-path (fs/expand-home "~/.lift_records/db.json"))
 (def pattern #"(\d+)x(\d+)")
+
+(defmacro db-keys [last]
+  (vector 'name 'set 'reps last))
 
 (defn load-db
   []
-  (if-let [db (slurp db-path)]
+  (if-let [db (and (.exists (io/as-file db-path)) (slurp db-path))]
     (json/read-str db)
     (do (io/make-parents db-path)
         (spit db-path "{}")
@@ -23,10 +27,10 @@
   [db name set reps]
   (get-in db [name set reps :max]))
 
-(defn set-new-record
-  [db name set reps {w :weight date :date :as record}]
-  (let [updated (assoc-in-with conj db (db-keys :records) record [])]
-    (assoc-in-with #(if (> %1 %2) %1 %2) updated (db-keys :max) w 0)))
+(defn get-records
+  [db name set reps]
+  (get-in db [name set reps :records]))
+
 
 (defn assoc-in-with 
   [f map keys val default]
@@ -34,8 +38,11 @@
     (assoc-in map keys (f old val))
     (assoc-in map keys (f default val))))
 
-(defmacro db-keys [last]
-  (vector 'name 'set 'reps last))
+(defn set-new-record
+  [db name set reps {w :weight date :date :as record}]
+  (let [updated (assoc-in-with conj db (db-keys :records) record [])]
+    (assoc-in-with #(if (> %1 %2) %1 %2) updated (db-keys :max) w 0)))
+
 
 
 
