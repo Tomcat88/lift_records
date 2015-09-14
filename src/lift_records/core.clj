@@ -11,17 +11,25 @@
         date (format/unparse formatter (t/now))
         w (read-string weight)]
     ;;(println records name set reps weight w)
-    (partial db/set-new-record records name set reps {:weight w :date date})))
+    (comp db/save-db 
+          (partial db/set-new-record records name set reps {:weight w :date date}))))
+
+(defn prepare-record
+  [records [name setreps]]
+  (let [[_ set reps] (re-find db/pattern setreps)]
+    (comp 
+     (partial println "Max for " name " " setreps "is : ")
+     (partial get-in records [name set reps "max"]))))
 
 (defn -main
   [op & args]
   (let [records (db/load-db)
         f (condp = op
           "add" (prepare-add records args)
-          "record" "record op"
-          (str "default"))]
+          "record" (prepare-record records args)
+          (str "Action unknown!"))]
     ;;(println records (f))
-    (db/save-db (f))
+    (f)
     ))
 
 
