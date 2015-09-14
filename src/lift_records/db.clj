@@ -40,8 +40,8 @@
 
 (defn set-new-record
   [db name set reps {w :weight date :date :as record}]
-  (let [updated (assoc-in-with conj db (db-keys :records) record [])]
-    (assoc-in-with #(if (> %1 %2) %1 %2) updated (db-keys :max) w 0)))
+  (let [updated (assoc-in-with conj db (db-keys "records") record [])]
+    (assoc-in-with #(if (> %1 %2) %1 %2) updated (db-keys "max") w 0)))
 
 
 

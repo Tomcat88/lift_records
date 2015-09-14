@@ -21,13 +21,21 @@
      (partial println "Max for " name " " setreps "is : ")
      (partial get-in records [name set reps "max"]))))
 
+(defn prepare-story
+  [records [name setreps]]
+  (let [[_ set reps] (re-find db/pattern setreps)]
+    (fn [] 
+      (doseq [{w "weight" d "date"} (get-in records [name set reps "records"])]
+        (println d "->" w "kg")))))
+
 (defn -main
   [op & args]
   (let [records (db/load-db)
         f (condp = op
           "add" (prepare-add records args)
           "record" (prepare-record records args)
-          (str "Action unknown!"))]
+          "story" (prepare-story records args)
+          #(println "Action unknown!"))]
     ;;(println records (f))
     (f)
     ))
