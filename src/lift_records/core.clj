@@ -33,7 +33,7 @@
   (let [records (db/load-db)
         f (condp = op
           "add" (prepare-add records args)
-          "record" (prepare-record records args)
+          "max" (prepare-record records args)
           "story" (prepare-story records args)
           #(println "Action unknown!"))]
     ;;(println records (f))
